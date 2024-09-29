@@ -1,37 +1,47 @@
 const todoList = () => {
-  const all = [];
+  const formattedDate = (d) => {
+    return d.toISOString().split('T')[0];
+  };
+
+  var dateToday = new Date();
+  const today = formattedDate(dateToday);
+  const yesterday = formattedDate(
+    new Date(new Date().setDate(dateToday.getDate() - 1))
+  );
+  const tomorrow = formattedDate(
+    new Date(new Date().setDate(dateToday.getDate() + 1))
+  );
+
+  let all = [];
   const add = (todoItem) => {
     all.push(todoItem);
   };
-
-  const todayDate = new Date().toISOString().split('T')[0];
-
   const markAsComplete = (index) => {
     all[index].completed = true;
   };
 
   const overdue = () => {
-    return all.filter((todo) => todo.dueDate < todayDate && !todo.completed);
+    return all.filter((todo) => todo.dueDate < today);
   };
 
   const dueToday = () => {
-    return all.filter((todo) => todo.dueDate === todayDate);
+    return all.filter((todo) => todo.dueDate === today);
   };
 
   const dueLater = () => {
-    return all.filter((todo) => todo.dueDate > todayDate);
+    return all.filter((todo) => todo.dueDate > today);
   };
 
   const toDisplayableList = (list) => {
-    return list.map(todo => {
-      const checkbox = todo.completed ? '[x]' : '[ ]'; 
-       return todo.completed 
-      ? `${checkbox} ${todo.title}` 
-      : todo.dueDate === new Date().toISOString().split("T")[0]
-      ? `${checkbox} ${todo.title}` // No date for tasks due today
-      : `${checkbox} ${todo.title} ${todo.dueDate}`; 
-    }).join('\n'); 
-  }
+    return list
+      .map(
+        (todo) =>
+          `${todo.completed ? '[x]' : '[ ]'} ${todo.title}${
+            todo.dueDate === today ? '' : ' ' + todo.dueDate
+          }`
+      )
+      .join('\n');
+  };
 
   return {
     all,
@@ -44,9 +54,4 @@ const todoList = () => {
   };
 };
 
-// ####################################### #
-// DO NOT CHANGE ANYTHING BELOW THIS LINE. #
-// ####################################### #
-
-const todos = todoList();
-export default todos;
+module.exports = todoList;
