@@ -23,15 +23,15 @@ const todoList = () => {
   };
 
   const toDisplayableList = (list) => {
-    return list
-      .map((todo) => {
-        const checkbox = todo.completed ? '[x]' : '[ ]';
-        return todo.completed
-          ? `${checkbox} ${todo.title}`
-          : `${checkbox} ${todo.title} ${todo.dueDate}`;
-      })
-      .join('\n');
-  };
+    return list.map(todo => {
+      const checkbox = todo.completed ? '[x]' : '[ ]'; 
+       return todo.completed 
+      ? `${checkbox} ${todo.title}` 
+      : todo.dueDate === new Date().toISOString().split("T")[0]
+      ? `${checkbox} ${todo.title}` // No date for tasks due today
+      : `${checkbox} ${todo.title} ${todo.dueDate}`; 
+    }).join('\n'); 
+  }
 
   return {
     all,
@@ -49,5 +49,4 @@ const todoList = () => {
 // ####################################### #
 
 const todos = todoList();
-
 export default todos;
