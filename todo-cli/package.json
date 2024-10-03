@@ -1,21 +1,19 @@
 {
+  "name": "database",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "commonjs",
   "scripts": {
-    "test": "jest",
-    "prepare": "husky install todo-cli/.husky"
+    "db:create:test": "NODE_ENV=test npx sequelize-cli db:create",
+    "pretest": "NODE_ENV=test npx sequelize-cli db:drop && NODE_ENV=test npx sequelize-cli db:create",
+    "test": "NODE_ENV=test jest --detectOpenHandles",
+    "prepare": "husky install"
   },
-  "lint-staged": {
-    "*.js": [
-      "eslint",
-      "prettier --write ."
-    ]
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.11.1",
-    "eslint": "^9.11.1",
-    "globals": "^15.9.0",
-    "husky": "^9.1.6",
+  "author": "Ayush Mishra <ayushmishra.5a@gmail.com>",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
     "jest": "^29.7.0",
-    "lint-staged": "^15.2.10",
-    "prettier": "^3.3.3"
+    "sequelize": "^6.37.3"
   }
 }
