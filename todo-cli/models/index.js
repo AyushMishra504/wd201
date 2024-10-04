@@ -1,86 +1,38 @@
-// models/todo.js
+/* eslint-disable no-undef */
 'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class Todo extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static async addTask(params) {
-      return await Todo.create(params);
-    }
-    static async showList() {
-      console.log("My Todo list \n");
+const fs = require('fs');
+const path = require('path');
+const Sequelize = require('sequelize');
+const process = require('process');
+const basename = path.basename(__filename);
+const env = process.env.NODE_ENV || 'development';
+const config = require(__dirname + '/../config/config.json')[env];
+const db = {};
 
-      console.log("Overdue");
-      // FILL IN HERE
-      console.log("\n");
+let sequelize;
+if (config.use_env_variable) {
+  sequelize = new Sequelize(process.env[config.use_env_variable], config);
+} else {
+  sequelize = new Sequelize(config.database, config.username, config.password, config);
+}
 
-      console.log("Due Today");
-      // FILL IN HERE
-      console.log("\n");
-
-      console.log("Due Later");
-      // FILL IN HERE
-    }
-
-    static async overdue() {
-      // FILL IN HERE TO RETURN OVERDUE ITEMS
-    }
-
-    static async dueToday() {
-      // FILL IN HERE TO RETURN ITEMS DUE tODAY
-    }
-
-    static async dueLater() {
-      // FILL IN HERE TO RETURN ITEMS DUE LATER
-    }
-
-    static async markAsComplete(id) {
-      // FILL IN HERE TO MARK AN ITEM AS COMPLETE
-
-    }
-
-    displayableString() {
-      let checkbox = this.completed ? "[x]" : "[ ]";
-      return `${this.id}. ${checkbox} ${this.title} ${this.dueDate}`;
-    }
-  }
-  Todo.init({
-    title: DataTypes.STRING,
-    dueDate: DataTypes.DATEONLY,
-    completed: DataTypes.BOOLEAN
-  }, {
-    sequelize,
-    modelName: 'todos',
+fs
+  .readdirSync(__dirname)
+  .filter(file => {
+    return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
+  })
+  .forEach(file => {
+    const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
+    db[model.name] = model;
   });
-  return Todo;
-};
-// Create a new instance of Sequelize (adjust your database connection as needed)
-const sequelize = new Sequelize('your_database_name', 'your_username', 'your_password', {
-  host: 'localhost',
-  dialect: 'postgres', // or 'mysql', 'sqlite', etc.
-});
 
-// Import model files
-const Todo = require('./todo')(sequelize, DataTypes); // Call the model function with sequelize and DataTypes
-
-// Create an object to hold the models
-const db = {
-  Todo, // Now this holds the Todo model
-  sequelize,
-};
-
-// Optional: Attach associations if needed
-Object.keys(db).forEach((modelName) => {
+Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
   }
 });
 
-// Export the db object containing the models and sequelize instance
+db.sequelize = sequelize;
+db.Sequelize = Sequelize;
+
 module.exports = db;
