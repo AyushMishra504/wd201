@@ -1,35 +1,23 @@
-/* eslint-disable no-undef */
-
-const express = require("express");
+/* eslint-disable no-unused-vars */
+const { request, response } = require("express");
+const express = require("express"); //imports the EXPRESS module installed via NPM
 const app = express();
 const { Todo } = require("./models");
-const path = require("path");
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
-app.set("view engine", "ejs");
-
-app.use(express.static(path.join(__dirname, "public")));
-
-app.get("/", async (request, response) => {
-  const allTodos = await Todo.getTodos();
-  response.render("index", { allTodos: allTodos });
+app.get("/todos", (request, response) => {
+  console.log("Todo List");
 });
 
-app.get("/todos", async function (_request, response) {
-  console.log("Processing list of all Todos ...");
-  if (request.accepts("html")) {
-    response.render("index", allTodos);
-  } else {
-    response.json(allTodos);
-  }
-  const todos = await Todo.findAll();
-  response.json(todos);
-});
-
-app.get("/todos/:id", async function (request, response) {
+app.post("/todos", async (request, response) => {
+  console.log("creating a Todo", request.body);
   try {
-    const todo = await Todo.findByPk(request.params.id);
+    const todo = await Todo.addTodo({
+      title: request.body.title,
+      dueDate: request.body.dueDate,
+      completed: false,
+    });
     return response.json(todo);
   } catch (error) {
     console.log(error);
@@ -37,21 +25,12 @@ app.get("/todos/:id", async function (request, response) {
   }
 });
 
-app.post("/todos", async function (request, response) {
-  try {
-    const todo = await Todo.addTodo(request.body);
-    return response.json(todo);
-  } catch (error) {
-    console.log(error);
-    return response.status(422).json(error);
-  }
-});
-
-app.put("/todos/:id/markAsCompleted", async function (request, response) {
+app.put("/todos/:id/markAsCompleted", async (request, response) => {
+  console.log("We have to update a Todo with ID", request.params.id);
   const todo = await Todo.findByPk(request.params.id);
   try {
-    const updatedTodo = await todo.markAsCompleted();
-    return response.json(updatedTodo);
+    const updated_todo = await todo.markAsCompleted();
+    return response.json(updated_todo);
   } catch (error) {
     console.log(error);
     return response.status(422).json(error);
