@@ -15,6 +15,14 @@ app.get("/", async (request, response) => {
   const allTodos = await Todo.getTodos();
   response.render("index", { allTodos: allTodos });
 });
+(async () => {
+  await Todo.addTodo({
+    title: "Complete Physics Assignment",
+    dueDate: "2024-10-10",
+  });
+  await Todo.addTodo({ title: "Grocery Shopping", dueDate: "2024-10-07" });
+  await Todo.addTodo({ title: "Prepare for Midterms", dueDate: "2024-10-15" });
+})();
 
 app.get("/todos", async function (_request, response) {
   console.log("Processing list of all Todos ...");
