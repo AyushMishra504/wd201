@@ -10,7 +10,7 @@
     "prepare": "husky"
   },
   "production": {
-    "use_env_variable":"DATABASE_URL",
+    "use_env_variable": "DATABASE_URL",
     "dialect": "postgres"
   },
   "author": "Ayush Mishra <ayushmishra.5a@gmail.com>",
