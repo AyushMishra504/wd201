@@ -1,3 +1,4 @@
+//models/todo.js
 "use strict";
 
 const { Model } = require("sequelize");
@@ -17,6 +18,10 @@ module.exports = (sequelize, DataTypes) => {
     }
     markAsCompleted() {
       return this.update({ completed: true });
+    }
+
+    static getTodos() {
+      return this.findAll();
     }
   }
   Todo.init(
