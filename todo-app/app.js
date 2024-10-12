@@ -15,24 +15,31 @@ app.get("/", async (request, response) => {
   const allTodos = await Todo.getTodos();
   response.render("index", { allTodos: allTodos });
 });
-(async () => {
-  await Todo.addTodo({
-    title: "Complete Physics Assignment",
-    dueDate: "2024-10-10",
-  });
-  await Todo.addTodo({ title: "Grocery Shopping", dueDate: "2024-10-07" });
-  await Todo.addTodo({ title: "Prepare for Midterms", dueDate: "2024-10-15" });
-})();
 
-app.get("/todos", async function (_request, response) {
-  console.log("Processing list of all Todos ...");
-  if (request.accepts("html")) {
-    response.render("index", allTodos);
-  } else {
-    response.json(allTodos);
+app.get("/todos", async (req, res) => {
+  try {
+    // Fetch all todos from the database
+    const todos = await Todo.findAll();
+
+    // Group todos based on due date
+    const overdue = todos.filter(
+      (todo) => new Date(todo.dueDate) < new Date() && !todo.completed
+    );
+    const dueToday = todos.filter(
+      (todo) =>
+        new Date(todo.dueDate).toDateString() === new Date().toDateString() &&
+        !todo.completed
+    );
+    const dueLater = todos.filter(
+      (todo) => new Date(todo.dueDate) > new Date() && !todo.completed
+    );
+
+    // Render todos.ejs and pass the grouped todos
+    res.render("todos", { overdue, dueToday, dueLater });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error fetching todos");
   }
-  const todos = await Todo.findAll();
-  response.json(todos);
 });
 
 app.get("/todos/:id", async function (request, response) {
@@ -76,4 +83,25 @@ app.delete("/todos/:id", async function (request, response) {
   }
 });
 
+app.get("/", async (req, res) => {
+  try {
+    const allTodos = await Todo.findAll();
+    const today = new Date().toISOString().split("T")[0];
+
+    const overdueTodos = allTodos.filter(
+      (todo) => todo.dueDate < today && !todo.completed
+    );
+    const dueTodayTodos = allTodos.filter(
+      (todo) => todo.dueDate === today && !todo.completed
+    );
+    const dueLaterTodos = allTodos.filter(
+      (todo) => todo.dueDate > today && !todo.completed
+    );
+
+    res.render("index", { overdueTodos, dueTodayTodos, dueLaterTodos });
+  } catch (error) {
+    console.error("Error fetching todos:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
 module.exports = app;
