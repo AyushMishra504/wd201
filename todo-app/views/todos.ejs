@@ -1,5 +1,20 @@
-<h5>Overdue</h5>
-<ul class="list-none">
+<h5>
+  Overdue
+  <span
+    id="count-overdue"
+    style="
+      background-color: #f39c12;
+      color: white;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 14px;
+      margin-left: 8px;
+    "
+    >(0)</span
+  >
+</h5>
+<ul class="list-none" id="overdue-list">
   <li class="Todo-Item">
     <div
       class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50"
@@ -65,8 +80,22 @@
     </div>
   </li>
 </ul>
-<h5>Due Today</h5>
-<ul class="list-none">
+<h5>
+  Due Today<span
+    id="count-due-today"
+    style="
+      background-color: #f39c12;
+      color: white;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 14px;
+      margin-left: 8px;
+    "
+    >0</span
+  >
+</h5>
+<ul class="list-none" id="due-today-list">
   <li class="Todo-Item">
     <div
       class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50"
@@ -132,8 +161,23 @@
     </div>
   </li>
 </ul>
-<h5>Due Later</h5>
-<ul class="list-none">
+<h5>
+  Due Later
+  <span
+    id="count-due-later"
+    style="
+      background-color: #f39c12;
+      color: white;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 14px;
+      margin-left: 8px;
+    "
+    >0</span
+  >
+</h5>
+<ul class="list-none" id="due-later-list">
   <li class="Todo-Item">
     <div
       class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50"
@@ -199,3 +243,31 @@
     </div>
   </li>
 </ul>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const overdueItems = document.querySelectorAll(
+      "#overdue-list .Todo-Item"
+    ).length;
+    document.getElementById("count-overdue").textContent = overdueItems;
+  });
+</script>
+
+<!-- Script to count Due Today items -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const dueTodayItems = document.querySelectorAll(
+      "#due-today-list .Todo-Item"
+    ).length;
+    document.getElementById("count-due-today").textContent = dueTodayItems;
+  });
+</script>
+
+<!-- Script to count Due Later items -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const dueLaterItems = document.querySelectorAll(
+      "#due-later-list .Todo-Item"
+    ).length;
+    document.getElementById("count-due-later").textContent = dueLaterItems;
+  });
+</script>
