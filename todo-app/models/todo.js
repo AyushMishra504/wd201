@@ -1,27 +1,52 @@
 //models/todo.js
-"use strict";
 
-const { Model } = require("sequelize");
+/* eslint-disable no-unused-vars */
+"use strict";
+const { Model, Op, Sequelize } = require("sequelize");
+
+const today = new Date().toLocaleDateString("en-ca");
+
 module.exports = (sequelize, DataTypes) => {
   class Todo extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
-     
+     */
     static associate(models) {
       // define association here
     }
-      */
-    static addTodo({ title, dueDate }) {
-      return this.create({ title: title, duedate: dueDate, completed: false });
-    }
-    markAsCompleted() {
-      return this.update({ completed: true });
+
+    static dueToday() {
+      return this.findAll({
+        where: {
+          dueDate: today,
+        },
+      });
     }
 
-    static getTodos() {
-      return this.findAll();
+    static overdue() {
+      return this.findAll({
+        where: {
+          dueDate: { [Sequelize.Op.lt]: today },
+        },
+      });
+    }
+
+    static dueLater() {
+      return this.findAll({
+        where: {
+          dueDate: { [Sequelize.Op.gt]: today },
+        },
+      });
+    }
+
+    static addTodo({ title, dueDate }) {
+      return this.create({ title: title, dueDate: dueDate, completed: false });
+    }
+
+    markAsCompleted() {
+      return this.update({ completed: true });
     }
   }
   Todo.init(

@@ -1,4 +1,5 @@
 /* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
 
 const express = require("express");
 const app = express();
@@ -6,39 +7,29 @@ const { Todo } = require("./models");
 const path = require("path");
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
-
+app.use(express.urlencoded({ extended: false }));
 app.set("view engine", "ejs");
-
 app.use(express.static(path.join(__dirname, "public")));
 
-app.get("/", async (request, response) => {
-  const allTodos = await Todo.getTodos();
-  response.render("index", { allTodos: allTodos });
-});
-
-app.get("/todos", async (req, res) => {
+app.get("/", async (req, res) => {
   try {
-    // Fetch all todos from the database
-    const todos = await Todo.findAll();
+    const allTodos = await Todo.findAll();
+    const today = new Date().toISOString().split("T")[0];
 
-    // Group todos based on due date
-    const overdue = todos.filter(
-      (todo) => new Date(todo.dueDate) < new Date() && !todo.completed
+    const overdueTodos = allTodos.filter(
+      (todo) => todo.dueDate < today && !todo.completed
     );
-    const dueToday = todos.filter(
-      (todo) =>
-        new Date(todo.dueDate).toDateString() === new Date().toDateString() &&
-        !todo.completed
+    const dueTodayTodos = allTodos.filter(
+      (todo) => todo.dueDate === today && !todo.completed
     );
-    const dueLater = todos.filter(
-      (todo) => new Date(todo.dueDate) > new Date() && !todo.completed
+    const dueLaterTodos = allTodos.filter(
+      (todo) => todo.dueDate > today && !todo.completed
     );
 
-    // Render todos.ejs and pass the grouped todos
-    res.render("todos", { overdue, dueToday, dueLater });
+    res.render("index", { overdueTodos, dueTodayTodos, dueLaterTodos });
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Error fetching todos");
+    console.error("Error fetching todos:", error);
+    res.status(500).send("Internal Server Error");
   }
 });
 
@@ -52,10 +43,13 @@ app.get("/todos/:id", async function (request, response) {
   }
 });
 
-app.post("/todos", async function (request, response) {
+app.post("/todos", async (request, response) => {
   try {
-    const todo = await Todo.addTodo(request.body);
-    return response.json(todo);
+    const todo = await Todo.addTodo({
+      title: request.body.title,
+      dueDate: request.body.dueDate,
+    });
+    return response.redirect("/");
   } catch (error) {
     console.log(error);
     return response.status(422).json(error);
@@ -83,25 +77,4 @@ app.delete("/todos/:id", async function (request, response) {
   }
 });
 
-app.get("/", async (req, res) => {
-  try {
-    const allTodos = await Todo.findAll();
-    const today = new Date().toISOString().split("T")[0];
-
-    const overdueTodos = allTodos.filter(
-      (todo) => todo.dueDate < today && !todo.completed
-    );
-    const dueTodayTodos = allTodos.filter(
-      (todo) => todo.dueDate === today && !todo.completed
-    );
-    const dueLaterTodos = allTodos.filter(
-      (todo) => todo.dueDate > today && !todo.completed
-    );
-
-    res.render("index", { overdueTodos, dueTodayTodos, dueLaterTodos });
-  } catch (error) {
-    console.error("Error fetching todos:", error);
-    res.status(500).send("Internal Server Error");
-  }
-});
 module.exports = app;
